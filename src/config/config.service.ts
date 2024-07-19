@@ -1,6 +1,6 @@
 
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-
+import entities from 'src/entities';
 require('dotenv').config();
 
 class ConfigService {
@@ -35,7 +35,6 @@ class ConfigService {
   public getTypeOrmConfig(): TypeOrmModuleOptions {
     return {
       type: 'postgres',
-
       host: this.getValue('DATABASE_HOST'),
       port: parseInt(this.getValue('DATABASE_PORT')),
       username: this.getValue('DATABASE_USERNAME'),
