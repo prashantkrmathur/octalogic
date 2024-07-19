@@ -19,6 +19,9 @@ export class UserEntity {
     @Column()
     mobile: Number;
 
+    @Column()
+    password: string;
+    
     @CreateDateColumn()
     createdDate: Date;
   

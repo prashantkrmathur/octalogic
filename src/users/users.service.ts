@@ -16,7 +16,7 @@ export class UsersService {
       console.log('createUserDto', createUserDto);
       const user = this.userRepository.create(createUserDto);
       console.log(user);
-      
+
       return {
         statuscode: 201,
         message: 'User created successfully',
@@ -33,8 +33,18 @@ export class UsersService {
   }
 
   async findAll() {
-    const user = await this.userRepository.find();
-    return user;
+    try {
+      const users = await this.userRepository.find();
+      return {statusCode : 200, data : users}
+    } catch (error) {
+      console.log("error while fetching the users",error);
+      
+      return {
+        status: 400,
+        message: 'Error in creating the user',
+        error: error,
+      }
+    }
   }
 
   findOne(id: number) {
