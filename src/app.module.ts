@@ -4,10 +4,23 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { VehicleModule } from './vehicle/vehicle.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { configService } from './config/config.service';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import typeorm from './config/typeorm';
 
 @Module({
-  imports: [UsersModule, VehicleModule,TypeOrmModule.forRoot(configService.getTypeOrmConfig())
+  imports: [
+    UsersModule,
+    VehicleModule,
+    AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [typeorm]
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => (configService.get('typeorm'))
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
