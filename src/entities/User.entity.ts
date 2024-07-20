@@ -13,11 +13,11 @@ export class UserEntity {
     @Column()
     lastName : string;
 
-    @Column()
+    @Column({unique:true})
     email : string;
 
-    @Column()
-    mobile: Number;
+    @Column({type:'bigint'})
+    mobile: number;
 
     @Column()
     password: string;
