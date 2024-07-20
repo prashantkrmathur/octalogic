@@ -7,15 +7,26 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import typeorm from './config/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './auth/jwt-auth/jwt.strategy';
 
 @Module({
   imports: [
     UsersModule,
     VehicleModule,
     AuthModule,
+    PassportModule,
+
     ConfigModule.forRoot({
       isGlobal: true,
       load: [typeorm]
+    }),
+    JwtModule.registerAsync({
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET_KEY'),
+      }),
+      inject: [ConfigService],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
@@ -23,6 +34,9 @@ import typeorm from './config/typeorm';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    JwtStrategy
+  ],
 })
 export class AppModule {}

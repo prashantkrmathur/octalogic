@@ -3,7 +3,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
 import { from } from 'rxjs';
 import { LoginUserDto } from './dto/login-user.dto';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/User.entity';
 import { Repository } from 'typeorm';
@@ -11,12 +11,17 @@ const bcrypt = require('bcrypt');
 
 @Injectable()
 export class AuthService {
+  jwtOption: { secret: string; };
   constructor(
     @InjectRepository(UserEntity)
-    private readonly userRepository : Repository<UserEntity>,
+    private readonly userRepository: Repository<UserEntity>,
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) {
+    this.jwtOption = {
+      secret: 'secret', 
+    }
+  }
 
   async registerUser(registerUserDto: CreateUserDto) {
     try {
@@ -24,34 +29,27 @@ export class AuthService {
         registerUserDto;
 
       let findUser;
-      
-      if (email.length > 0) {
-        console.log("inside check email");
-        
-        findUser = await this.userRepository.find(
-          {
-            where: { email: email }
-          }
-        )
-        console.log('findUser', findUser);
 
+      if (email.length > 0) {
+        findUser = await this.userService.findUserByEmail(email);
+      }
+      if (mobile) {
+        findUser = await this.userService.findUserByMobile(mobile);
       }
 
-      if (findUser.length) {
+      console.log('existingUser', findUser);
+
+      if (findUser) {
         return { statusCode: 400, meassage: 'Already a registered user.' };
       }
-  
 
       const hashedPassword = await this.hashPassword(password);
-
-      const mobileNumber = Number(mobile)
-      if (!findUser.length ){
-        console.log('register', registerUserDto);
-        await this.userRepository.save({
+      if (!findUser) {
+        await this.userService.createUser({
           firstName,
           lastName,
           email,
-          mobile:mobileNumber,
+          mobile,
           password: hashedPassword,
           profilePic,
         });
@@ -74,7 +72,9 @@ export class AuthService {
       if (!user) {
         return { status: 400, message: 'User not found' };
       }
-      const isPasswordMatch = await this.comparePasswords(
+      console.log('check password', password);
+
+      const isPasswordMatch = await this.validatePassword(
         password,
         user.password,
       );
@@ -84,14 +84,13 @@ export class AuthService {
       const token = await this.jwtService.signAsync({
         id: user.id,
         email: user.email,
-      });
+      },this.jwtOption);
       return { status: 200, message: 'Login success', token: token };
     } catch (error) {
       console.log('error while login the user', error);
-
       return {
         status: 400,
-        message: 'Error in creating the user',
+        message: 'Error while fetching the user',
         error: error,
       };
     }
@@ -109,6 +108,8 @@ export class AuthService {
     storedPasswordHash: string,
   ): Promise<boolean> {
     const encpass = await bcrypt.compare(password, storedPasswordHash);
+    console.log('encpass', encpass);
+
     return encpass;
   }
 

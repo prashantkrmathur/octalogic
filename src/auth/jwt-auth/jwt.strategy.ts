@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-require('dotenv').config();
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(configService: ConfigService) {
+    console.log('JWT_SECRET_KEY  in the jwt:', configService.get<string>('JWT_SECRET_KEY')); // Log the key
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       secretOrKey: configService.get<string>('JWT_SECRET_KEY'),
@@ -17,8 +17,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any) {
     return {
       id: payload.id,
-      phone: payload.sub,
-      fullName: payload.fullName,
       email: payload.email,
     };
   }
