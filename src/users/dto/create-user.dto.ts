@@ -28,3 +28,13 @@ export class CreateUserDto {
     profilePic: string
 
 }
+
+export class CredentialDto{
+    @IsNotEmpty()
+    @IsString()
+    email : string;
+
+    @IsNotEmpty()
+    @IsString()
+    password: string;
+}

@@ -9,18 +9,11 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     public readonly userRepository: Repository<UserEntity>,
-  ) {}
+  ) { }
   async createUser(createUserDto: CreateUserDto) {
     try {
-      console.log('createUserDto', createUserDto);
       const user = this.userRepository.create(createUserDto);
-      console.log(user);
-
-      return {
-        statuscode: 201,
-        message: 'User created successfully',
-        user: user,
-      };
+      return user;
     } catch (error) {
       console.log('error in creating user ', error);
       return {
@@ -32,33 +25,46 @@ export class UsersService {
   }
 
   async findUserByEmail(email: string) {
-   try {
-    console.log('here');
-
-    const user = await this.userRepository.findOne({ where: { email: email } });
-    console.log("user", user);
-
-    return user;
-   } catch (error) {
-    console.log("error while fetching user", error);
-    return error;
-   }
+    try {
+      const user = await this.userRepository.findOne({ where: { email: email } });
+      return user;
+    } catch (error) {
+      console.log("error while fetching user", error);
+      return error;
+    }
   }
 
   async findUserByMobile(mobile) {
-    const user = await this.userRepository.findOne({
-      where: { mobile },
-    });
-    return user;
-  }
-
-  async findAll() {
     try {
-      const users = await this.userRepository.find();
-
-      return users
+      const user = await this.userRepository.findOne({
+        where: { mobile },
+      });
+      return user;
     } catch (error) {
-      
+      console.log("error while fetching user by mobile no", error);
+      return error;
     }
   }
+
+  async getUserProfile(request) {
+    try {
+      console.log("request", request.user);
+      const user = await this.getUserById(request.user.sub)
+      return { statuscode: 200, user: user };
+    } catch (error) {
+      console.log("error while getting profile", error);
+      return error;
+    }
+  }
+
+  async getUserById(id) {
+    try {
+      return this.userRepository.findOne({
+        where: { id: id },
+      })
+    } catch (error) {
+
+    }
+  }
+
 }

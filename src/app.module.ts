@@ -16,8 +16,7 @@ import { JwtStrategy } from './auth/jwt-auth/jwt.strategy';
     UsersModule,
     VehicleModule,
     AuthModule,
-    PassportModule,
-
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [typeorm]

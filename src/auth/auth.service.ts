@@ -1,26 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
 import { from } from 'rxjs';
 import { LoginUserDto } from './dto/login-user.dto';
-import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/User.entity';
 import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 const bcrypt = require('bcrypt');
 
 @Injectable()
 export class AuthService {
-  jwtOption: { secret: string; };
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService
   ) {
-    this.jwtOption = {
-      secret: 'secret', 
-    }
   }
 
   async registerUser(registerUserDto: CreateUserDto) {
@@ -81,10 +79,11 @@ export class AuthService {
       if (!isPasswordMatch) {
         return { status: 400, message: 'Invalid password' };
       }
-      const token = await this.jwtService.signAsync({
-        id: user.id,
-        email: user.email,
-      },this.jwtOption);
+      const payload = { email: user.email, sub: user.id};
+      const secretKey =  this.configService.get<string>('JWT_SECRET_KEY');
+      const token = await this.jwtService.signAsync(payload,{
+        secret : secretKey
+      });
       return { status: 200, message: 'Login success', token: token };
     } catch (error) {
       console.log('error while login the user', error);
@@ -108,8 +107,9 @@ export class AuthService {
     storedPasswordHash: string,
   ): Promise<boolean> {
     const encpass = await bcrypt.compare(password, storedPasswordHash);
-    console.log('encpass', encpass);
-
+    if (!encpass) {
+      throw new UnauthorizedException();
+    }
     return encpass;
   }
 
