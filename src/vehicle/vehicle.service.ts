@@ -1,26 +1,100 @@
 import { Injectable } from '@nestjs/common';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
-import { UpdateVehicleDto } from './dto/update-vehicle.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { VehicleType } from '../entities/VehicleType.entity';
+import { Vehicle } from '../entities/Vehicle.entity';
+import { VehicleTypeDto } from './dto/create-vehicle-type.dto';
+import { Repository } from 'typeorm';
+import { Booking } from '../entities/Booking.entity';
 
 @Injectable()
 export class VehicleService {
-  create(createVehicleDto: CreateVehicleDto) {
-    return 'This action adds a new vehicle';
+  constructor(
+    @InjectRepository(VehicleType)
+    private readonly vehicleTypeRepository: Repository<VehicleType>,
+
+    @InjectRepository(Vehicle)
+    private readonly vehicleRepository: Repository<Vehicle>,
+
+    @InjectRepository(Booking)
+    private readonly bookingRepository : Repository<Booking>
+
+
+  ) { }
+  async createVehicletype(vehicleTypeDto: VehicleTypeDto) {
+    try {
+      const createVehicleType = await this.vehicleTypeRepository.save(vehicleTypeDto)
+      return { statusCode: 201, data: createVehicleType }
+    } catch (error) {
+      console.log("error while creating vehicle type", this.createVehicletype);
+      return {
+        status: 400,
+        message: 'Error while creating vehicle type',
+        error: error.message,
+      };
+    }
   }
 
-  findAll() {
-    return `This action returns all vehicle`;
+  async getAllVehicleTypes() {
+    try {
+
+      const allVehicleTypes = await this.vehicleTypeRepository.find(
+        {
+          relations: ['vehicle'],
+        }
+      );
+      return { statusCode: 200, data: allVehicleTypes }
+    } catch (error) {
+      console.log("error while getting all vehicle types", error);
+      return {
+        status: 400,
+        message: 'Error while getting all vehicle types',
+        error: error.message,
+      }
+
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} vehicle`;
+  async addVehicle(createVehicleDto: CreateVehicleDto) {
+    try {
+      const createVehicle = await this.vehicleRepository.save(createVehicleDto)
+      return { statusCode: 201, data: createVehicle }
+
+    } catch (error) {
+      console.log("error while creating vehicle", error);
+      return {
+        status: 400,
+        message: 'Error while creating vehicle',
+        error: error.message,
+      }
+
+    }
   }
 
-  update(id: number, updateVehicleDto: UpdateVehicleDto) {
-    return `This action updates a #${id} vehicle`;
+  async getAllVehicle() {
+    try {
+      const allVehicle = await this.vehicleRepository.find({
+         relations: {
+          vehicleType: true,
+      }
+     });
+      return { statusCode: 200, data: allVehicle }
+    } catch (error) {
+      console.log("error while getting all vehicle", error);
+      return {
+        status: 400,
+        message: 'Error while getting all vehicle',
+        error: error.message,
+      }
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} vehicle`;
+  async bookVehicle(){
+    try {
+      
+      
+    } catch (error) {
+      
+    }
   }
 }

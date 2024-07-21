@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { VehicleType } from "./VehicleType.entity";
 import { Booking } from "./Booking.entity";
 
@@ -10,10 +10,13 @@ export class Vehicle {
     id: string;
 
     @Column()
-    name: string;
+    make: string;
 
     @Column()
-    imageUrl: string
+    category : string;
+
+    @Column()
+    imageUrl: string;
 
     @Column()
     model: string;
@@ -25,7 +28,11 @@ export class Vehicle {
     pricePerDay: number;
 
     @ManyToOne(() => VehicleType, (vehicleType => vehicleType.vehicle))
+    @JoinColumn({ name: 'vehicleTypeId' })
     vehicleType: VehicleType
+
+    @Column()
+    vehicleTypeId: string
 
     @OneToMany(() => Booking, booking => booking.vehicle)
     bookings: Booking[];
