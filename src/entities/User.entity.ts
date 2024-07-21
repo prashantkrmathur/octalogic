@@ -1,4 +1,5 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Booking } from "./Booking.entity";
 
 
 
@@ -22,6 +23,9 @@ export class UserEntity {
     @Column()
     password: string;
     
+    @OneToMany(() => Booking, booking => booking.user)
+    bookings: Booking[];
+
     @CreateDateColumn()
     createdDate: Date;
   

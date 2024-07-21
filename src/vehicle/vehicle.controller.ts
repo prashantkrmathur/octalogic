@@ -7,7 +7,7 @@ import { UpdateVehicleDto } from './dto/update-vehicle.dto';
 export class VehicleController {
   constructor(private readonly vehicleService: VehicleService) {}
 
-  @Post()
+  @Post('add')
   create(@Body() createVehicleDto: CreateVehicleDto) {
     return this.vehicleService.create(createVehicleDto);
   }
