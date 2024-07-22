@@ -4,7 +4,7 @@ import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
 import { VehicleTypeDto } from './dto/create-vehicle-type.dto';
 import { BookVehicleDto } from './dto/book-vehicle.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { AuthGuard } from '../auth/jwt-auth/jwt-auth.guard';
 
 @Controller('vehicle')
 export class VehicleController {
@@ -25,6 +25,7 @@ export class VehicleController {
     return await this.vehicleService.addVehicle(createVehicleDto);
   }
 
+  @UseGuards(AuthGuard)
   @Get('all')
   async getAllVehicle(){
     return await this.vehicleService.getAllVehicle();
