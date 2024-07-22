@@ -14,7 +14,7 @@ const config = {
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     migrations: ["dist/migrations/*{.ts,.js}"],
     autoLoadEntities: true,
-    synchronize: false,
+    synchronize: true,
 }
 
 console.log("config entities", config.entities);

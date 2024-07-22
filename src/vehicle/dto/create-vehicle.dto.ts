@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from "class-validator";
 
 export class CreateVehicleDto {
     @IsNotEmpty()
@@ -29,5 +29,9 @@ export class CreateVehicleDto {
     @IsNotEmpty()
     @IsUUID()
     vehicleTypeId : string
+
+    @IsOptional()
+    @IsBoolean()
+    isBooked ?: boolean
 
 }

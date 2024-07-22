@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { VehicleService } from './vehicle.service';
 import { CreateVehicleDto } from './dto/create-vehicle.dto';
 import { UpdateVehicleDto } from './dto/update-vehicle.dto';
 import { VehicleTypeDto } from './dto/create-vehicle-type.dto';
+import { BookVehicleDto } from './dto/book-vehicle.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('vehicle')
 export class VehicleController {
@@ -28,9 +30,9 @@ export class VehicleController {
     return await this.vehicleService.getAllVehicle();
   } 
 
-  @Post('bookVehicle') 
-  async bookVehicle() {
-    return await this.vehicleService.bookVehicle();
+  @Post('booking') 
+  async bookVehicle(@Body() bookVehicleDto: BookVehicleDto) {
+    return await this.vehicleService.bookVehicle(bookVehicleDto);
   }
 
 }

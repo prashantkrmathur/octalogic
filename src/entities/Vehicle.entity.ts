@@ -27,6 +27,9 @@ export class Vehicle {
     @Column()
     pricePerDay: number;
 
+    @Column()
+    isBooked : boolean;
+
     @ManyToOne(() => VehicleType, (vehicleType => vehicleType.vehicle))
     @JoinColumn({ name: 'vehicleTypeId' })
     vehicleType: VehicleType

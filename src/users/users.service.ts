@@ -12,7 +12,7 @@ export class UsersService {
   ) { }
   async createUser(createUserDto: CreateUserDto) {
     try {
-      const user = this.userRepository.create(createUserDto);
+      const user =await this.userRepository.save(createUserDto);
       return user;
     } catch (error) {
       console.log('error in creating user ', error);
